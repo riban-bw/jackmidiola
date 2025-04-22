@@ -1,5 +1,5 @@
 # jackmidiola
-Interface JACK MIDI and Open Lighting Project
+Interface MIDI via JACK to DMX512 via Open Lighting Project.
 
 This application connects to `jackd` as a client, presenting a single MIDI input port. It connects to `olad` as a client and dispatches DMX512 messages based on the received MIDI messages. It can react to MIDI note-on and/or MIDI CC commands. Note-on commands are 7-bit, which loses 1 bit of resolution, halving the number of values. CC may be 7-bit or 14-bit and may use simple CC mapping with a limited number of slots and universes, or NRPN to give access to all 512 slots and up to 512 universes. Universes are sequential, but the base universe may be defined (default is to start at universe 1).
 

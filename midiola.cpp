@@ -21,7 +21,7 @@
  DMX512 universes supported but may start at any universe.
  */
 
-#define VERSION "0.1.4"
+#define VERSION "0.1.10"
 #define MAX_MIDI_UNIVERSE 32 // Defines quantity of universe data buffers
 
 #include <getopt.h>        // provides command line parseing
@@ -109,7 +109,7 @@ void help() {
        "if not specified when note-on is enabled).\n"
        "  -x --exclude     Do not listen on MIDI channel (1..16 Can be "
        "provided multiple times).\n"
-       "  -j --jackname    Name of jack client (default: midiola)"
+       "  -j --jackname    Name of jack client (default: midiola)\n"
        "  -m --mode        MIDI mode:\n"
        "    cc7   : CC 0..127 control slots 1..128. MIDI channel = universe "
        "(default).\n"
@@ -120,7 +120,7 @@ void help() {
        "(x32).\n"
        "    nrpn14: Same as nrpn7 with 8-bit DMX data, sent when LSB is "
        "received from CC38.\n"
-       "  -v --version     Show version."
+       "  -v --version     Show version.\n"
        "  -V --verbose     Set verbose level:\n"
        "    0: Silent\n"
        "    1: Show errors\n"
@@ -461,7 +461,7 @@ int main(int argc, char *argv[]) {
 
   // Setup OLA, connect to the server
   if (!olaClient.Setup()) {
-    error("Failed to setup OLA client\n");
+    error("Failed to setup OLA client. Is olad running?\n");
     exit(1);
   }
   // Initalise buffers and send to universe
@@ -476,20 +476,20 @@ int main(int argc, char *argv[]) {
   jack_status_t jackStatus;
   if ((g_jackClient = jack_client_open(g_jackname, JackNoStartServer,
                                        &jackStatus, serverName)) == 0) {
-    error("Failed to start jack client: %d\n", jackStatus);
+    error("Failed to start jack client: %d. Is jackd running?\n", jackStatus);
     exit(1);
   }
   // Create MIDI input port
   if (!(g_midiInputPort =
             jack_port_register(g_jackClient, "input", JACK_DEFAULT_MIDI_TYPE,
                                JackPortIsInput | JackPortIsPhysical, 0))) {
-    error("Cannot register input port\n");
+    error("Cannot register jack input port\n");
     exit(1);
   }
   // Register JACK callbacks
   jack_set_process_callback(g_jackClient, onJackProcess, 0);
   if (jack_activate(g_jackClient)) {
-    error("Cannot activate client\n");
+    error("Cannot activate jack client\n");
     exit(1);
   }
 

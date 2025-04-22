@@ -1,5 +1,7 @@
+Please check the following for grammatical mistakes.
+
 # jackmidiola
-Interface between JACK MIDI and Open Lighting Project
+Interface JACK MIDI and Open Lighting Project
 
 This application connects to jackd as a client, presenting a single MIDI input port. It connects to olad as a client and dispatches DMX512 messages base on the received MIDI messages. It can react to MIDI note-on and/or MIDI CC commands. Note-on commands are 7-bit which loses 1-bit resolution, halving the quantity of values. CC may be 7-bit or 14-bit and may use simple CC mapping with limited quantity of slots and universes or NRPN to give access to all 512 slots and up to 512 universes. Universes are sequential but the base universe may be defined (default is to start at universe 1).
 
@@ -78,4 +80,8 @@ The amount of information shown during execution is controlled with the `-V` or 
 
 ## Use Cases
 
-This application was designed to add DMX512 output to zynthian but may be used where an operating system is running jackd and olad to interconnect any jackd MIDI client to olad. The author is aminable to feature requests and bug reports. Please use GitHub issues.
+This application was designed to add DMX512 output to zynthian but may be used where an operating system is running jackd and olad to interconnect any jackd MIDI client to olad. The author is aminable to feature requests and bug reports. Please use [GitHub issues](https://github.com/riban-bw/jackmidiola/issues).
+
+## Licensing
+
+The MIT license was chosen for this project to allow its wide usage. MIT license is compatible with a wide range of licenses and use cases. Please observe the license conditions and it is nice to hear of acknowledgements, so do please feel free to mention this project.

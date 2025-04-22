@@ -52,6 +52,7 @@ enum MIDI_COMMAND {
 };
 
 bool g_enableNote = false;      // True to listen for MIDI note-on command
+bool g_enableNoteOff = false;   // True to listen for MIDI note-off command
 bool g_enableCC = false;        // True to listen for MIDI CC command
 uint8_t g_universeBase = 1;     // First DMX universe
 uint8_t g_universe = 1;         // Current DMX universe
@@ -105,6 +106,7 @@ void help() {
        "  -h --help        Show this help.\n"
        "  -u --universe    First universe (default: 1).\n"
        "  -n --note        Listen for MIDI note-on (disabled by default).\n"
+       "  -o --noteoff     Listen for MIDI note-off (disabled by default).\n"
        "  -c --cc          Listen for MIDI CC (enabled by default but disabled "
        "if not specified when note-on is enabled).\n"
        "  -x --exclude     Do not listen on MIDI channel (1..16 Can be "
@@ -119,7 +121,7 @@ void help() {
        "512..1023 control second universe, etc. MIDI channel offsets universe "
        "(x32).\n"
        "    nrpn14: Same as nrpn7 with 8-bit DMX data, sent when LSB is "
-       "received from CC38.\n"
+       "received from CC 38.\n"
        "  -v --version     Show version.\n"
        "  -V --verbose     Set verbose level:\n"
        "    0: Silent\n"
@@ -133,6 +135,7 @@ void parseCommandLine(int argc, char *argv[]) {
                        {"universe", optional_argument, NULL, 'u'},
                        {"cc", optional_argument, NULL, 'c'},
                        {"note", optional_argument, NULL, 'n'},
+                       {"noteoff", optional_argument, NULL, 'o'},
                        {"verbose", optional_argument, NULL, 'V'},
                        {"version", optional_argument, NULL, 'v'},
                        {"exclude", optional_argument, NULL, 'x'},
@@ -140,7 +143,7 @@ void parseCommandLine(int argc, char *argv[]) {
                        {"jackname", optional_argument, NULL, 'j'},
                        {NULL, 0, 0, 0}};
   while (1) {
-    const int opt = getopt_long(argc, argv, "chnvj:m:u:V:x:", longopts, 0);
+    const int opt = getopt_long(argc, argv, "chnovj:m:u:V:x:", longopts, 0);
     if (opt == -1) {
       break;
     }
@@ -175,6 +178,9 @@ void parseCommandLine(int argc, char *argv[]) {
       break;
     case 'n':
       g_enableNote = true;
+      break;
+    case 'o':
+      g_enableNoteOff = true;
       break;
     case 'j':
       if (optarg && strlen(optarg) < 256) {
@@ -417,6 +423,13 @@ int onJackProcess(jack_nframes_t frames, void *args) {
         nrpnCC14(chan, cc, val);
         break;
       }
+    } else if (g_enableNoteOff && (cmd == 0x80)) {
+      // MIDI Note-off
+      chan = midiEvent.buffer[0] & 0x0f;
+      if (((1 << chan) & g_midiChannels) == 0)
+        continue;
+      cc = midiEvent.buffer[1];
+      cc7(chan, cc, 0);
     } else if (g_enableNote && (cmd == 0x90)) {
       // MIDI Note-on
       chan = midiEvent.buffer[0] & 0x0f;
@@ -497,6 +510,8 @@ int main(int argc, char *argv[]) {
     info("Listening for MIDI CC\n");
   if (g_enableNote)
     info("Listening for MIDI Note-On\n");
+  if (g_enableNoteOff)
+    info("Listening for MIDI Note-Off\n");
 
   while (true) {
     usleep(25000); // Do nothing in program loop

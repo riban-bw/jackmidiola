@@ -12,3 +12,7 @@ add_executable(jackmidiola midiola.cpp)
 add_definitions(-Werror)
 target_link_libraries(jackmidiola jack ola olacommon protobuf)
 
+install(TARGETS jackmidiola
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
+)
+

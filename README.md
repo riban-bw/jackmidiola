@@ -7,12 +7,18 @@ This application connects to `jackd` as a client, presenting a single MIDI input
 
 This application interfaces with `jackd` and `olad`, so both need to be installed and running.
 
+The application is written in the C++ programming language (because ola bindings are for C++, not C) but you may notice some C style coding methods, e.g. use of fixed size buffers, use of printf, etc. (I would have written in C if the ola library had C bindings.)
+
 Build libraries required:
 
 - jack
 - ola
 - olacommon
 - protobuf
+
+On Debian based systems, `sudo apt install libjack-jackd2-dev libola-dev`.
+
+Of course you also need a c++ compiler and supporting libraries. On Debian based systems, `sudo apt install build-essential`.
 
 ## Building
 

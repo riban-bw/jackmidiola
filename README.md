@@ -5,7 +5,7 @@ This application connects to `jackd` as a client, presenting a single MIDI input
 
 ## Dependencies
 
-This application interfaces with `jackd` and `olad`, so both need to be installed and running.
+This application interfaces with `jackd` and `olad`, so both need to be installed and running. Tested with jackdmp 1.9.21 and olad 0.10.9.
 
 The application is written in the C++ programming language (because ola bindings are for C++, not C) but you may notice some C style coding methods, e.g. use of fixed size buffers, use of printf, etc. (I would have written in C if the ola library had C bindings.)
 
@@ -37,7 +37,7 @@ The executable file `jackmidiola` will be created in the build directory.
 
 ## Usage
 
-Running `jackmidiola` without command-line parameters will start the application using the default configuration. It will listen for JACK MIDI commands on its MIDI input port and send messages to OLAd.
+Running `jackmidiola` without command-line parameters will start the application using the default configuration. It will listen for JACK MIDI commands on its MIDI input port and send messages to OLA.
 
 Use `jackmidiola -h` to see command-line options:
 
@@ -85,6 +85,24 @@ The amount of information shown during execution is controlled with the `-V` or 
 ## Use Cases
 
 This application was designed to add DMX512 output to Zynthian but may be used wherever an operating system is running `jackd` and `olad` to interconnect any JACK MIDI client with `olad`. The author is amenable to feature requests and bug reports. Please use [GitHub issues](https://github.com/riban-bw/jackmidiola/issues).
+
+## Usueful Notes
+
+I use Debian based distributions which include OLA as an installable package. To get OLA running and configured:
+
+- To install OLA: `sudo apt install ola`.
+- To start OLA: `sudo systemctrl start olad`
+- To configure, point a web browser at http://hostname:9090/new/#. This shows the _new_ interface that has the advantage over the old one that you can disable plugins.
+- Click on the "Plugins" tab then enable required plugins and disable any conflicting plugings, e.g. to get a FTDI USB interface working, enable FTDI USB DMX and disable Serial USB, Enttec Open DMX, StageProfi. This seems to be because they all use /dev/ttyUSB0 (although that port does not actually appear so maybe it captures and renames it). If you need to use a mix of these plugins, you will need to edit their configurations, e.g. /etc/ola/ola-ftdidmx.conf.
+- Click on the "Universes" tab then add a universe. It is common practice to start with universe 1 which is the default used by _jackmidiola_. The universe has a Id (integer), Name (any text) and a plugin (select from checkboxes). The plugin selection defines which physical interface (or network protocol) to use for that universe. If you leave the name blank, it defaults to "Universe 1". I currently only have a single FTDI USB device so have not tested with multiple universes.
+
+The OLA web interface provides monitoring and control of DMX512 devices. Selecting the required universe from the "Universes" tab displays a set of tabs including:
+
+- Overview - shows the value of each DMX512 slot.
+- Faders - shows the value of each DMX512 slot and a fader to control the value, paged to fit on the screen. Note that the faders are old drawbar / quadrant fader style, drag down to increase value.
+- Settings - change the input and output ports used. You can enable multiple output ports to send duplicate data to multiple devices.
+
+To remove a universe you disable all ports in the settings and save. This is not intuitive and it is not evident that the universe has been removed until you access the universes tab again.
 
 ## Licensing
 
